@@ -1,3 +1,3 @@
-Graphic Equalizer for visualizing output from (https://github.com/sideb0ard/SoundB0ard)[Soundb0ard].
+Graphic Equalizer for visualizing output from [Soundb0ard](https://github.com/sideb0ard/SoundB0ard).
 
-Implementation based on (https://orangeable.com/javascript/equalizer-web-audio-api)[this article].
+Implementation based on [this article](https://orangeable.com/javascript/equalizer-web-audio-api).
