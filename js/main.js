@@ -1,47 +1,55 @@
-let canvas,
-  canvasContext,
-  source,
-  audioContext,
-  analyser,
-  fbc_array,
-  bar_count,
-  bar_pos,
-  bar_width,
-  bar_height;
+const audioContext = new AudioContext();
+let analyser;
+let canvas;
+let canvasContext;
+let fbc_array;
+let bar_count;
+let bar_pos;
+let bar_width;
+let bar_height;
 
-let audio = new Audio();
+const startAudio = async (context) => {
+  console.log("YO START AUDIO", context);
 
-audio.id = "audio_player";
-audio.src = "mp3/test.mp3";
-audio.controls = true;
-audio.loop = false;
-audio.autoplay = false;
+  const {
+    default: SharedBufferWorkletNode
+  } =
+  await import('./shared-buffer-worklet-node.js');
 
-window.addEventListener(
-  "load",
-  function() {
-    document.getElementById("audio").appendChild(audio);
+  await context.audioWorklet.addModule('./js/shared-buffer-worklet-processor.js');
+  const sbwNode = new SharedBufferWorkletNode(context, {
+    outputChannelCount: [2]
+  });
 
-    document.getElementById("audio_player").onplay = function() {
-      if (typeof(audioContext) === "undefined") {
-        audioContext = new AudioContext();
-        analyser = audioContext.createAnalyser();
-        canvas = document.getElementById("canvas");
-        canvasContext = canvas.getContext("2d");
-        source = audioContext.createMediaElementSource(audio);
+  analyser = context.createAnalyser();
+  canvas = document.getElementById("canvas");
+  canvasContext = canvas.getContext("2d");
 
-        canvas.width = window.innerWidth * 0.80;
-        canvas.height = window.innerHeight * 0.60;
+  sbwNode.onInitialized = () => {
+    sbwNode.connect(analyser);
+    // analyser.connect(context.destination);
+  };
 
-        source.connect(analyser);
-        analyser.connect(audioContext.destination);
-      }
+  sbwNode.onError = (errorData) => {
+    console.log('[ERROR] ' + errorData.detail);
+  };
+};
 
-      FrameLooper();
-    };
-  },
-  false
-);
+
+window.addEventListener('load', async () => {
+  console.log("LOOOAD MOFO!");
+  const buttonEl = document.getElementById('button-start');
+  buttonEl.disabled = false;
+  buttonEl.addEventListener('click', async () => {
+    console.log("CLIOCK YO MOFO!");
+    await startAudio(audioContext);
+    audioContext.resume();
+    buttonEl.disabled = true;
+    buttonEl.textContent = 'Playing...';
+
+    FrameLooper();
+  }, false);
+});
 
 function FrameLooper() {
   window.RequestAnimationFrame =
