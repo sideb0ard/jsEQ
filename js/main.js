@@ -23,6 +23,8 @@ const startAudio = async (context) => {
 
   analyser = context.createAnalyser();
   canvas = document.getElementById("canvas");
+  canvas.width = window.innerWidth * 0.8;
+  canvas.height = window.innerHeight * 0.6;
   canvasContext = canvas.getContext("2d");
 
   sbwNode.onInitialized = () => {
